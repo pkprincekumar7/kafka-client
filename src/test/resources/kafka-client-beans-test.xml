@@ -1,0 +1,49 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+http://www.springframework.org/schema/jdbc
+http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <context:component-scan base-package="com.tricon.common.kafkaclient" />
+
+    <bean name="baseConfiguration" class="com.tricon.common.kafkaclient.admin.BaseConfiguration" init-method="init">
+        <constructor-arg name="env" value="dev"/>
+    </bean>
+
+    <bean id="myTestProducerOne" class="com.tricon.common.kafkaclient.producer.Kafka10Producer" init-method="init">
+        <constructor-arg  index="0" ref="myZKService"/>
+    </bean>
+
+    <bean id="myZKService" class="com.tricon.common.kafkaclient.producer.ZKService" init-method="init">
+    </bean>
+
+<!--
+    <bean id="myTestConsumerOne" class="com.tricon.common.kafkaclient.consumer.KafkaConsumerSampleImpl" init-method="init" destroy-method="destroy">
+        <constructor-arg  index="0"  ref="myZKService"/>
+    </bean>
+-->
+
+
+    <jdbc:embedded-database id="dataSource" type="HSQL">
+        <jdbc:script location="classpath:db/sql/create-db.sql" />
+    </jdbc:embedded-database>
+
+  <!--  <bean id="eventdataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver" />
+        <property name="url" value="jdbc:postgresql://#{baseConfiguration.getDBProperty('db.host')}:#{baseConfiguration.getDBProperty('db.port')}/#{baseConfiguration.getDBProperty('db.database')}" />
+        <property name="username" value="#{baseConfiguration.getDBProperty('db.username')}" />
+        <property name="password" value="#{baseConfiguration.getDBProperty('db.password')}" />
+    </bean>-->
+
+    <bean id="eventdataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver"></property>
+        <property name="url" value="jdbc:postgresql://#{baseConfiguration.getDBProperty('db.host')}:#{baseConfiguration.getDBProperty('db.port')}/#{baseConfiguration.getDBProperty('db.database')}"></property>
+        <property name="username" value="#{baseConfiguration.getDBProperty('db.username')}"></property>
+        <property name="password" value="#{baseConfiguration.getDBProperty('db.username')}"></property>
+    </bean>
+</beans>
